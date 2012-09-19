@@ -1,6 +1,7 @@
 PhoneBookApp::Application.routes.draw do
   resources :phones
-  #root :to => 'phones#index'
+  
+  root :to => 'phones#index'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

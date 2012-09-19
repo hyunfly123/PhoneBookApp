@@ -11,3 +11,12 @@
  *= require_self
  *= require_tree .
  */
+
+textarea {
+	resize: none;
+	vertical-align: middle;
+}
+
+.largeTArea {
+	height: 150px;
+}

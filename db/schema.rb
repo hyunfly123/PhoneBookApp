@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120919080533) do
+ActiveRecord::Schema.define(:version => 20120919085128) do
 
   create_table "phones", :force => true do |t|
     t.datetime "created_at", :null => false

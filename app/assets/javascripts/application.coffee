@@ -14,18 +14,17 @@
 
 class window.PhoneBookApp extends Backbone.Router
   initialize: ->
-
+    window.bookCoverView = new PhoneBook.PhoneCoverView()
 
   routes:
     '':    'index'
 
   index: ->
-
+    $('body').html(window.bookCoverView.render())
     
   start: ->
-    Backbone.history.start({pushState: true})
-    alert "Router Start"
+    Backbone.history.start({ pushState: true })
     
 
-window.phonebookApp = new window.PhoneApp
+window.phonebookApp = new window.PhoneBookApp
 $( -> window.phonebookApp.start())
