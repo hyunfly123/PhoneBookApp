@@ -1,10 +1,19 @@
 class PhoneBook.PhoneView extends Backbone.View
   template: JST['templates/record']
+  tagName: 'tr'
+  isChecked: false
   initialize: ->
-    0
-    
-
+    this.model.on('hide', this.remove, this)
+    this.model.view = this
+  events:
+    'change input': 'selected'
   render: ->
-   # $(this.el).html(@template)
-    #$("body").html(this.el)
+    $(this.el).append(@template(@model.toJSON()))
+  selected: (e) ->
+    if ($(e.target).is(':checked')) is true
+      @isChecked = true
+    else
+      @isChecked = false
+  
+
 
