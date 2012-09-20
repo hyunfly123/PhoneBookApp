@@ -7,6 +7,7 @@ class PhoneBook.PhoneCollectionView extends Backbone.View
     @collection.on('remove', @destroyPhone, this)
     
   render: ->
+    $(this.el).html('')
     @addAllPhones()
     $(this.el)
   

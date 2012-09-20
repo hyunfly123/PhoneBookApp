@@ -15,25 +15,34 @@
 class window.PhoneBookApp extends Backbone.Router
   initialize: ->
     window.bookCoverView = new PhoneBook.PhoneCoverView()
+    window.bookEditView = new PhoneBook.PhoneEditView()
     window.phoneCollection = new PhoneBook.Phones()
     window.phoneCollectionView = new PhoneBook.PhoneCollectionView({ collection: window.phoneCollection })
     $('body').html(window.bookCoverView.render())
-    $('#phoneTable').append(window.phoneCollectionView.render())
-    $('#addPhone').click @add
-    $('#clearPhone').click @clear
-    $('#removePhone').click @remove
-    @start
+    $('#phoneTable').html(window.phoneCollectionView.render())
+    @start()
 
   routes:
-    '':    'index' 
-    'phones/:id': 'show'
+    '' :    'main'
+    'phones/:id/edit' : 'edit'
   
-  index: ->
-  
-  show: (id) ->
-    @collection.get(id)
+  main: ->
+    $('body').html(window.bookCoverView.render())
+    $('#phoneTable').html(window.phoneCollectionView.render())
+    $('#addPhone').click => @add()
+    $('#clearPhone').click => @clear()
+    $('#removePhone').click => @remove()
     
-        
+  edit: (id) ->
+    $('body').html(window.bookEditView.render())
+    @currentPhone = window.phoneCollection.get(id)
+    @populatePhone()
+    $('#apply').click => @update()
+    $('#home').click => @backHome()
+    
+  backHome: ->
+    window.phonebookApp.navigate('/', true)
+   
   start: ->
     Backbone.history.start({ pushState: true })
   
@@ -49,12 +58,29 @@ class window.PhoneBookApp extends Backbone.Router
     phoneModel.save()
     window.phoneCollection.add(phoneModel)
     
+  update: ->
+    @currentPhone.set('last_name', $('#lastName').val())
+    @currentPhone.set('first_name', $('#firstName').val())
+    @currentPhone.set('number', $('#phoneNum').val())
+    @currentPhone.set('address', $('#address').val())
+    @currentPhone.set('comments', $('#comments').val())
+    
+    @currentPhone.save()
+    window.phonebookApp.navigate('/', true)
+    
   
   clear: ->
     window.phoneCollectionView.removeAllPhones()
     
   remove: ->
     window.phoneCollectionView.removeSelected()
+    
+  populatePhone: ->
+    $('#lastName').text(@currentPhone.get('last_name'))
+    $('#firstName').text(@currentPhone.get('first_name'))
+    $('#phoneNum').text(@currentPhone.get('number'))
+    $('#address').text(@currentPhone.get('address'))
+    $('#comments').text(@currentPhone.get('comments'))
   
   
     

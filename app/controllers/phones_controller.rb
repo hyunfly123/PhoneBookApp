@@ -16,7 +16,7 @@ class PhonesController < ApplicationController
     @phone = Phone.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { render 'index' }
       format.json { render json: @phone }
     end
   end
@@ -35,6 +35,7 @@ class PhonesController < ApplicationController
   # GET /phones/1/edit
   def edit
     @phone = Phone.find(params[:id])
+    render 'index'
   end
 
   # POST /phones
