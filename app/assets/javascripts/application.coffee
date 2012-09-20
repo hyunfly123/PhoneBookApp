@@ -21,24 +21,47 @@ class window.PhoneBookApp extends Backbone.Router
     $('body').html(window.bookCoverView.render())
     $('#phoneTable').html(window.phoneCollectionView.render())
     @start()
-
+    
   routes:
     '' :    'main'
     'phones/:id/edit' : 'edit'
   
   main: ->
     $('body').html(window.bookCoverView.render())
-    $('#phoneTable').html(window.phoneCollectionView.render())
-    $('#addPhone').click => @add()
-    $('#clearPhone').click => @clear()
-    $('#removePhone').click => @remove()
+    @setTextarea()
+    $('#phoneTable').html("Loading......")
+    window.phoneCollection.fetch
+      success: (collection, response) =>
+        if collection.length is 0
+          $('#phoneTable').html(window.phoneCollectionView.render().append("No Phone Record!"))
+        else
+          $('#phoneTable').html(window.phoneCollectionView.render().prepend('<tr><th/><th>Last Name</th><th>First Name</th><th>Phone #</th><th>Address</th><th>Comments</th></tr>'))
+        $('#addPhone').click => @add()
+        $('#clearPhone').click => @clear()
+        $('#removePhone').click => @remove()
     
   edit: (id) ->
     $('body').html(window.bookEditView.render())
-    @currentPhone = window.phoneCollection.get(id)
-    @populatePhone()
-    $('#apply').click => @update()
-    $('#home').click => @backHome()
+    window.phoneCollection.fetch
+      success: (collection, response) =>
+        @currentPhone = window.phoneCollection.get(id)
+        @populatePhone()
+        $('#apply').click => @update()
+        $('#home').click => @backHome()
+  
+  setTextarea: ->
+    #@setPlaceHolder($('#firstName'), "Required Field")
+    #@setPlaceHolder($('#lastName'), "Required Field")
+    #@setPlaceHolder($('#address'), "Required Field")
+  
+  setPlaceHolder: (textarea, phMsg) ->
+    textarea.text(phMsg)
+    textarea.focus -> 
+      if textarea.val() is phMsg
+        textarea.text('')
+    textarea.blur ->
+      if textarea.val() is ""
+        textarea.text(phMsg)
     
   backHome: ->
     window.phonebookApp.navigate('/', true)
@@ -55,8 +78,18 @@ class window.PhoneBookApp extends Backbone.Router
       comments: $('#comments').val()
 
     phoneModel = new PhoneBook.Phone data
-    phoneModel.save()
-    window.phoneCollection.add(phoneModel)
+    phoneModel.save(
+        null,{
+        success: (model, response) =>
+          window.phoneCollection.add(phoneModel)
+        error: @modelError})
+  
+  modelError: (model, response) ->
+    errorMsg = "Error!!"
+    errorData = $.parseJSON(response.responseText)
+    _.each(errorData, (key, value) -> errorMsg += "\n#{key}: #{value}")      
+    alert errorMsg
+
     
   update: ->
     @currentPhone.set('last_name', $('#lastName').val())
@@ -65,8 +98,11 @@ class window.PhoneBookApp extends Backbone.Router
     @currentPhone.set('address', $('#address').val())
     @currentPhone.set('comments', $('#comments').val())
     
-    @currentPhone.save()
-    window.phonebookApp.navigate('/', true)
+    @currentPhone.save(
+        null,{
+        success: (model, response) =>
+          window.phonebookApp.navigate('/', true)
+        error: @modelError})
     
   
   clear: ->
@@ -87,4 +123,3 @@ class window.PhoneBookApp extends Backbone.Router
     
 
 window.phonebookApp = new window.PhoneBookApp()
-window.phoneCollection.fetch()
